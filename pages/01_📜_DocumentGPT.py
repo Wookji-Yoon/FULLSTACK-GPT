@@ -10,7 +10,7 @@ from langchain.chat_models import ChatOpenAI
 from langchain.callbacks.base import BaseCallbackHandler
 from langchain.memory import ConversationSummaryBufferMemory
 
-st.set_page_config(page_title="DocumentGPT", page_icon="🔒")
+st.set_page_config(page_title="DocumentGPT", page_icon="📜")
 
 
 @st.cache_resource

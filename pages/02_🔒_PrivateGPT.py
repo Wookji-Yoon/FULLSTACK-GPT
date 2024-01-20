@@ -1,16 +1,16 @@
 import streamlit as st
 from langchain.document_loaders import UnstructuredFileLoader
 from langchain.text_splitter import CharacterTextSplitter
-from langchain.embeddings import OpenAIEmbeddings, CacheBackedEmbeddings
+from langchain.embeddings import OllamaEmbeddings, CacheBackedEmbeddings
 from langchain.vectorstores import FAISS
 from langchain.storage import LocalFileStore
 from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain.schema.runnable import RunnableLambda, RunnablePassthrough
-from langchain.chat_models import ChatOpenAI
+from langchain.chat_models import ChatOllama
 from langchain.callbacks.base import BaseCallbackHandler
 from langchain.memory import ConversationSummaryBufferMemory
 
-st.set_page_config(page_title="PrivateGPT", page_icon="📜")
+st.set_page_config(page_title="PrivateGPT", page_icon="🔒")
 
 
 @st.cache_resource
@@ -37,7 +37,8 @@ def init_llm(chat_callback: bool):
     else:
         callbacks = []
 
-    return ChatOpenAI(
+    return ChatOllama(
+        model="mistral:latest",
         temperature=0.1,
         streaming=True,
         callbacks=callbacks,
@@ -82,7 +83,7 @@ def handle_file(file):
         separator="\n", chunk_size=600, chunk_overlap=100
     )
     embedder = CacheBackedEmbeddings.from_bytes_store(
-        underlying_embeddings=OpenAIEmbeddings(),
+        underlying_embeddings=OllamaEmbeddings(model="mistral:latest"),
         document_embedding_cache=LocalFileStore("./.cache/private_embeddings/"),
     )
 
@@ -143,6 +144,7 @@ with st.sidebar:
     file = st.file_uploader(
         "Upload a .txt, .pdf or .docx files!", ["txt", "pdf", "docx"]
     )
+    st.selectbox("Choose a model", ["ChatGPT", "Ollama", "Falcon"], index=1)
 
 if file:
     retriever = handle_file(file)
